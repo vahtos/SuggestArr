@@ -84,33 +84,41 @@ class PlexClient:
         :return: A list of recent items in JSON format if successful, otherwise an empty list.
         """
         all_filtered_items = []
-
-        for user_id in self.user_ids:
+        user_ids = self.user_ids if self.user_ids else [None]  # Use None if no specific user is selected
+    
+        for user_id in user_ids:
             url = f"{self.api_url}/status/sessions/history/all"
             params = {
                 "sort": "viewedAt:desc",
-                "accountID": user_id,  # Specific user filter
             }
-
+    
+            # If a specific user is selected, add the accountID parameter
+            if user_id:
+                params["accountID"] = user_id
+    
+            # Add library filtering if libraries are specified
             if self.library_ids:
                 params["librarySectionIDs"] = ','.join(self.library_ids)
-
+    
             try:
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url, headers=self.headers, params=params, timeout=REQUEST_TIMEOUT) as response:
                         if response.status == 200:
                             data = await response.json()
                             metadata = data.get('MediaContainer', {}).get('Metadata', [])
-
-                            # Filter items for this specific user and add to the combined list
+    
+                            # Filter items for this specific user (or all users) and add to the combined list
                             filtered_items = await self.filter_recent_items(metadata)
                             all_filtered_items.extend(filtered_items)
-                            self.logger.info(f"User {user_id}: Returning {len(filtered_items)} filtered recent items.")
+                            if user_id:
+                                self.logger.info(f"User {user_id}: Returning {len(filtered_items)} filtered recent items.")
+                            else:
+                                self.logger.info(f"All users: Returning {len(filtered_items)} filtered recent items.")
                         else:
-                            self.logger.error("Failed to retrieve recent items for user %s: %d", user_id, response.status)
+                            self.logger.error("Failed to retrieve recent items for user %s: %d", user_id or "all", response.status)
             except aiohttp.ClientError as e:
-                self.logger.error("An error occurred while retrieving recent items for user %s: %s", user_id, str(e))
-
+                self.logger.error("An error occurred while retrieving recent items for user %s: %s", user_id or "all", str(e))
+    
         self.logger.info(f"Total filtered items across all users: {len(all_filtered_items)}")
         
         return all_filtered_items
