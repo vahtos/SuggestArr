@@ -78,7 +78,10 @@
 
         <!-- Users Selection -->
         <div v-if="users.length > 0">
-            <p class="text-sm text-gray-300 mt-4">Select the Plex Users you want to include:</p>
+            <p class="text-sm sm:text-lg font-semibold text-gray-300 mt-4 flex items-center">
+                Select the Plex Users you want to include
+                <span class="ml-2 px-2 py-1 bg-yellow-500 text-xs text-white font-bold rounded-full">BETA</span>
+            </p>
             <span class="text-gray-400 text-xs">(If no users are selected, all users will be included.)</span>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                 <div 
