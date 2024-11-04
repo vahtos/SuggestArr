@@ -159,6 +159,7 @@ class PlexClient:
                     if response.status == 200:
                         item_data = await response.json()
                         guids = item_data.get('MediaContainer', {}).get('Metadata', [])[0].get('Guid', [])
+                        self.logger.info( f"Guids found for item {item_id}: {guids}")
 
                         for guid in guids:
                             guid_id = guid.get('id', '')
