@@ -86,7 +86,8 @@ class ContentAutomation:
                 api_url=env_vars['PLEX_API_URL'],
                 token=env_vars['PLEX_TOKEN'],
                 max_content=instance.max_content,
-                library_ids=env_vars.get('PLEX_LIBRARIES')
+                library_ids=env_vars.get('PLEX_LIBRARIES'),
+                user_ids=instance.selected_users
             )
             await plex_client.init_existing_content()
             instance.media_handler = PlexHandler(plex_client, jellyseer_client, tmdb_client, instance.logger, instance.max_similar_movie, instance.max_similar_tv)
