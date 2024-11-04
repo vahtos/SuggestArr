@@ -60,9 +60,7 @@ def register_routes(app): # pylint: disable=redefined-outer-name
         """
         Serve the built frontend's index.html or any other static file.
         """
-        app.static_folder = os.path.join(os.path.dirname(__file__), '../client/dist')
-        full_path = os.path.join(app.static_folder, path or 'index.html')
-        print(f"Trying to serve: {full_path}")  # Log del percorso effettivo
+        app.static_folder = '../static'
         if path == "" or not os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, 'index.html')
         else:
