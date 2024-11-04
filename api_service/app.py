@@ -2,11 +2,12 @@
 Main Flask application for managing environment variables and running processes.
 """
 from concurrent.futures import ThreadPoolExecutor
+import logging
 import os
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 from asgiref.wsgi import WsgiToAsgi
-
+import atexit
 
 from api_service.utils.utils import AppUtils
 from api_service.config.logger_manager import LoggerManager
@@ -59,7 +60,9 @@ def register_routes(app): # pylint: disable=redefined-outer-name
         """
         Serve the built frontend's index.html or any other static file.
         """
-        app.static_folder = '../static'
+        app.static_folder = os.path.join(os.path.dirname(__file__), '../client/dist')
+        full_path = os.path.join(app.static_folder, path or 'index.html')
+        print(f"Trying to serve: {full_path}")  # Log del percorso effettivo
         if path == "" or not os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, 'index.html')
         else:
@@ -68,6 +71,13 @@ def register_routes(app): # pylint: disable=redefined-outer-name
 
 app = create_app()
 asgi_app = WsgiToAsgi(app)
+
+def close_log_handlers():
+    for handler in logging.root.handlers[:]:
+        handler.close()
+        logging.root.removeHandler(handler)
+
+atexit.register(close_log_handlers)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
