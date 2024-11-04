@@ -108,15 +108,17 @@ export default {
     },
     getServerConnections() {
       return this.servers.reduce((connections, server) => {
-        server.connections.forEach(connection => {
-          connections.push({
-            serverName: server.name,
-            address: connection.address,
-            port: connection.port,
-            protocol: connection.protocol,
-            secure: connection.protocol === 'https',
+        if (server.connections) {
+          server.connections.forEach(connection => {
+            connections.push({
+              serverName: server.name,
+              address: connection.address,
+              port: connection.port,
+              protocol: connection.protocol,
+              secure: connection.protocol === 'https',
+            });
           });
-        });
+        }
         return connections;
       }, []);
     },
