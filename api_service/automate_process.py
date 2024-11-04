@@ -34,6 +34,7 @@ class ContentAutomation:
         instance.max_similar_tv = min(int(env_vars.get('MAX_SIMILAR_TV', '2')), 20)
         instance.search_size = min(int(env_vars.get('SEARCH_SIZE', '20')), 100)
         instance.number_of_seasons = env_vars.get('FILTER_NUM_SEASONS') or "all"
+        instance.selected_users = env_vars.get('SELECTED_USERS') or []
         
         # TMDB filters
         tmdb_threshold = int(env_vars.get('FILTER_TMDB_THRESHOLD') or 60)
@@ -76,7 +77,9 @@ class ContentAutomation:
                 env_vars.get('JELLYFIN_LIBRARIES')
             )
             await jellyfin_client.init_existing_content()
-            instance.media_handler = JellyfinHandler(jellyfin_client, jellyseer_client, tmdb_client, instance.logger, instance.max_similar_movie, instance.max_similar_tv)
+            instance.media_handler = JellyfinHandler(
+                jellyfin_client, jellyseer_client, tmdb_client, instance.logger, instance.max_similar_movie, instance.max_similar_tv, instance.selected_users
+            )
 
         elif instance.selected_service == 'plex':
             plex_client = PlexClient(
